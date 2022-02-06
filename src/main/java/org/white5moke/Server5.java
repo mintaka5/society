@@ -14,7 +14,6 @@ public class Server5 {
 
         String dataIn;
         Socket client = server.accept();
-        System.out.println();
         String clientAddress = client.getInetAddress().getHostAddress();
         System.out.println("server: new connection from " + clientAddress);
 
