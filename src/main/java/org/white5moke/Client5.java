@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client5 extends Thread {
+public class Client5 implements Runnable {
     private Socket socket;
     private Scanner scan;
 
@@ -40,6 +40,5 @@ public class Client5 extends Thread {
 
     public static void main(String[] args) throws IOException {
         Client5 client = new Client5("localhost", 6887);
-        client.start();
     }
 }

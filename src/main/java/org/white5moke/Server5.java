@@ -1,35 +1,29 @@
 package org.white5moke;
 
-import java.io.*;
+import org.white5moke.castlegate.Client5Handler;
+
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server5 {
+    private static final int MAX_THREADS = 5;
+
     private ServerSocket server;
+    private ExecutorService exe;
 
     public Server5() throws IOException {
         server = new ServerSocket(6887);
         System.out.println("server is listening on port " + server.getLocalPort());
 
-        String dataIn;
+        exe = Executors.newFixedThreadPool(MAX_THREADS);
+
         Socket client = server.accept();
-        String clientAddress = client.getInetAddress().getHostAddress();
-        System.out.println("server: new connection from " + clientAddress);
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        PrintWriter out = new PrintWriter(client.getOutputStream());
-
-        while(true) {
-            dataIn = in.readLine().trim();
-            if(dataIn.length() > 0) {
-                // print on server instance what the client said (client won't see this)
-                System.out.println("client said: " + dataIn);
-                // send back to the client some protocol treatment
-                out.println("server said: " + dataIn.toUpperCase());
-                out.flush();
-            }
-        }
+        Client5Handler handler = new Client5Handler(client);
+        exe.submit(handler);
     }
 
     public InetAddress getSocketAddress() {
