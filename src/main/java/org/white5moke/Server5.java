@@ -1,40 +1,26 @@
 package org.white5moke;
 
-import org.white5moke.castlegate.Client5Handler;
-
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server5 {
+    private final int port;
     private static final int MAX_THREADS = 5;
+    private final ServerSocket serverSocket;
 
-    private ServerSocket server;
-    private ExecutorService exe;
-
-    public Server5() throws IOException {
-        server = new ServerSocket(6887);
-        System.out.println("server is listening on port " + server.getLocalPort());
-
-        exe = Executors.newFixedThreadPool(MAX_THREADS);
-
-        Socket client = server.accept();
-        Client5Handler handler = new Client5Handler(client);
-        exe.submit(handler);
+    public Server5(int port) throws IOException {
+        this.port = port;
+        this.serverSocket = new ServerSocket(this.port);
+        AtomicInteger counter = new AtomicInteger(0);
+        System.out.println("server: server started.");
     }
 
-    public InetAddress getSocketAddress() {
-        return server.getInetAddress();
-    }
-
-    public int getPort() {
-        return server.getLocalPort();
-    }
-
-    public static void main(String[] args) throws IOException {
-        Server5 server = new Server5();
+    public static void main(String[] args) {
+        try {
+            new Server5(6882);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
