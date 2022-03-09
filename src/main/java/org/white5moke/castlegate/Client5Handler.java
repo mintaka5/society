@@ -7,12 +7,12 @@ import java.net.Socket;
 
 public class Client5Handler extends Thread {
     private Socket serverClient;
-    private int clientIndex;
+    private String clientId;
 
 
-    public Client5Handler(Socket client, int index) {
+    public Client5Handler(Socket client, String id) {
         serverClient = client;
-        clientIndex = index;
+        clientId = id;
     }
 
     @Override
@@ -26,7 +26,8 @@ public class Client5Handler extends Thread {
             while(!clientMessage.equalsIgnoreCase("BYE")) {
                 clientMessage = inStream.readUTF();
                 if(clientMessage.length() > 0) {
-                    System.out.println("CLIENT [" + clientIndex + "]: " + clientMessage);
+                    System.out.println("CLIENT [" + clientId + "]: " + clientMessage);
+
                     // after here do stuff on the server
                     outStream.writeUTF("BIGGER! " + clientMessage.toUpperCase());
                     outStream.flush();

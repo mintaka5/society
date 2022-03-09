@@ -22,6 +22,7 @@ public class Client5 {
         while(!clientMessage.equalsIgnoreCase("BYE")) {
             System.out.print("client: enter something: ");
             clientMessage = reader.readLine();
+
             outStream.writeUTF(clientMessage);
             outStream.flush();
             serverMessage = inStream.readUTF();
