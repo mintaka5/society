@@ -5,13 +5,16 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.cj5x.chain.stow.Keychain;
+import org.cj5x.chain.stow.Storage;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Instant;
 
 public class CubeEngine extends Thread {
     private Keychain keychain;
     private CubeTrain train;
+    private Storage storage;
 
     public CubeEngine(CubeTrain cubeTrain, String passwd) {
         this.train = cubeTrain;
@@ -19,6 +22,10 @@ public class CubeEngine extends Thread {
                 Path.of(System.getProperty("user.home"), ".society", "society.pk8"),
                 passwd
         );
+        this.storage = new Storage(
+                Path.of(System.getProperty("user.home"), ".society", "storage")
+        );
+        this.storage.setKeychain(keychain);
     }
 
 
@@ -36,12 +43,14 @@ public class CubeEngine extends Thread {
         });
     }
 
-    private void mint() {
+    private Block mint() {
         Block block = new Block(
                 Hex.encodeHexString(RandomUtils.nextBytes(16)),
                 getTrain().getLastBlock().getHash()
         );
         train.getChain().add(block);
+
+        return block;
     }
 
     @Override
@@ -56,11 +65,18 @@ public class CubeEngine extends Thread {
                 // Thread.sleep(waitMillis);
                 Thread.sleep(3000);
 
-                mint();
+                Block mintedBlock = mint();
+                encryptIt(mintedBlock);
             } catch (InterruptedException e) {
                 System.err.println("unable to put the thread to bed... " + e.getMessage());
             }
         }
+    }
+
+    public void encryptIt(Block b) {
+        String bS = b.toString();
+        byte[] bB = bS.getBytes(StandardCharsets.UTF_8);
+
     }
 
     public CubeTrain getTrain() {
@@ -69,5 +85,13 @@ public class CubeEngine extends Thread {
 
     public Keychain getKeychain() {
         return this.keychain;
+    }
+
+    public Storage getStorage() {
+        return storage;
+    }
+
+    public void setStorage(Storage storage) {
+        this.storage = storage;
     }
 }

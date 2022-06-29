@@ -1,13 +1,12 @@
 package org.cj5x.chain.stow;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
+import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.provider.PEMUtil;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.operator.InputDecryptorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -19,7 +18,6 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS8EncryptedPrivateKeyInfoBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEInputDecryptorProviderBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemObjectGenerator;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
 
@@ -29,10 +27,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.*;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.RSAPublicKeySpec;
 
 public class Keychain {
     private Path path;
@@ -61,7 +59,7 @@ public class Keychain {
         Files.createDirectories(this.path.getParent());
         Files.createFile(this.path);
 
-        generate(2048);
+        generate(4096);
     }
 
     private void generate(int keySize) throws NoSuchAlgorithmException,
@@ -102,5 +100,11 @@ public class Keychain {
         PrivateKey decodeKey = cp.getPrivateKey(info);
 
         return decodeKey;
+    }
+
+    public PublicKey getPublicKey() throws IOException, PKCSException, NoSuchAlgorithmException, NoSuchProviderException {
+        PrivateKey privKey = fromFile();
+
+        return null;
     }
 }

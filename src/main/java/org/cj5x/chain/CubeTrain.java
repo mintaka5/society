@@ -31,7 +31,6 @@ import java.util.stream.Stream;
 
 public class CubeTrain {
     private static List<Block> chain = new ArrayList<Block>();
-    private Keychain keychain;
 
     public CubeTrain(String salt) {
         genesis(salt);
@@ -56,14 +55,9 @@ public class CubeTrain {
         String passwd = args[0].strip();
         CubeTrain ct = new CubeTrain(passwd);
         CubeEngine ce = new CubeEngine(ct, passwd);
-        ct.setKeychain(ce.getKeychain());
         ce.start();
 
         Runtime.getRuntime().addShutdownHook(new Shutdown(ce));
-    }
-
-    public void setKeychain(Keychain keyChain) {
-        this.keychain = keyChain;
     }
 
     private static class Shutdown extends Thread {
@@ -74,41 +68,6 @@ public class CubeTrain {
         }
         @Override
         public void run() {
-            Path p = Path.of(System.getProperty("user.home"), ".society", "storage");
-            if(!Files.exists(p)) {
-                try {
-                    Files.createDirectories(p.getParent());
-                    Files.createFile(p);
-                } catch (IOException e) {
-                    System.err.println("unable to create path. " + e);
-                }
-            }
-
-            JSONArray jA = new JSONArray();
-            cubeEngine.getTrain().getChain().forEach(block -> {
-                jA.put(block.toJSON());
-            });
-            String jS = jA.toString();
-
-            try {
-                PrivateKey privKey = this.cubeEngine.getKeychain().fromFile();
-                RSAPrivateCrtKey privCert = (RSAPrivateCrtKey) privKey;
-                RSAPublicKeySpec pubSpec = new RSAPublicKeySpec(privCert.getModulus(), privCert.getPublicExponent());
-                KeyFactory factory = KeyFactory.getInstance("RSA", "BC");
-                PublicKey pubKey = factory.generatePublic(pubSpec);
-                byte[] encChain = EncryptIt.encrypt(jS.getBytes(StandardCharsets.UTF_8), pubKey);
-                OutputStream writer = Files.newOutputStream(p, StandardOpenOption.TRUNCATE_EXISTING);
-                writer.write(encChain);
-                writer.flush();
-                writer.close();
-            } catch (IOException | PKCSException | InvalidKeySpecException
-                     | NoSuchAlgorithmException | NoSuchProviderException
-                     | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException
-                     | BadPaddingException e) {
-                e.printStackTrace();
-            }
-
-
             System.out.println("shutting down...");
         }
     }
