@@ -3,6 +3,10 @@ package org.cj5x.chain;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.time.Instant;
 
 public class Block {
@@ -23,6 +27,10 @@ public class Block {
 
     @Override
     public String toString() {
+        return toJSON().toString();
+    }
+
+    public JSONObject toJSON() {
         JSONObject j = new JSONObject();
         j.put("timestamp", getTimestamp());
         j.put("message", getMessage());
@@ -31,7 +39,7 @@ public class Block {
         j.put("difficulty", getDifficulty());
         j.put("hash", getHash());
 
-        return j.toString();
+        return j;
     }
 
     public long getTimestamp() {
