@@ -68,6 +68,11 @@ public class CubeTrain {
         }
         @Override
         public void run() {
+            try {
+                cubeEngine.getStorage().close();
+            } catch (IOException e) {
+                System.err.println("unable to close down storage engine.");
+            }
             System.out.println("shutting down...");
         }
     }

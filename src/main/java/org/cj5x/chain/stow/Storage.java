@@ -1,16 +1,13 @@
 package org.cj5x.chain.stow;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
 public class Storage {
     private Path storagePath;
-    private BufferedWriter outStream;
-    private BufferedReader inStream;
+    private FileOutputStream outStream;
+    private FileInputStream inStream;
     private Keychain keychain;
 
     public Storage(Path p) {
@@ -34,8 +31,8 @@ public class Storage {
     }
 
     private void init() throws IOException {
-        this.outStream = Files.newBufferedWriter(this.storagePath, StandardOpenOption.WRITE);
-        this.inStream = Files.newBufferedReader(this.storagePath);
+        this.outStream = new FileOutputStream(this.storagePath.toFile());
+        this.inStream = new FileInputStream(this.storagePath.toFile());
     }
 
     public void close() throws IOException {
@@ -52,11 +49,11 @@ public class Storage {
         this.keychain = kc;
     }
 
-    public BufferedWriter getOutStream() {
+    public FileOutputStream getOutStream() {
         return outStream;
     }
 
-    public BufferedReader getInStream() {
+    public InputStream getInStream() {
         return inStream;
     }
 }

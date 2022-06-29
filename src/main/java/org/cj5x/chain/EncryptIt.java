@@ -10,7 +10,7 @@ public class EncryptIt {
     public static byte[] encrypt(byte[] data, PublicKey pubKey) throws NoSuchPaddingException,
             NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException,
             IllegalBlockSizeException, BadPaddingException {
-        Cipher c = Cipher.getInstance("AES", "BC");
+        Cipher c = Cipher.getInstance("RSA", "BC");
         c.init(Cipher.ENCRYPT_MODE, pubKey);
 
         return c.doFinal(data);
@@ -19,7 +19,7 @@ public class EncryptIt {
     public static byte[] decrypt(byte[] encData, PrivateKey privKey) throws NoSuchPaddingException,
             NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException,
             IllegalBlockSizeException, BadPaddingException {
-        Cipher c = Cipher.getInstance("AES", "BC");
+        Cipher c = Cipher.getInstance("RSA", "BC");
         c.init(Cipher.DECRYPT_MODE, privKey);
 
         return c.doFinal(encData);

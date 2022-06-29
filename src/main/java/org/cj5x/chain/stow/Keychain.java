@@ -30,6 +30,8 @@ import java.nio.file.Path;
 import java.security.*;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 
 public class Keychain {
@@ -102,9 +104,16 @@ public class Keychain {
         return decodeKey;
     }
 
-    public PublicKey getPublicKey() throws IOException, PKCSException, NoSuchAlgorithmException, NoSuchProviderException {
+    public PublicKey getPublicKey() throws IOException, PKCSException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         PrivateKey privKey = fromFile();
 
-        return null;
+        KeyFactory factory = KeyFactory.getInstance("RSA", "BC");
+        RSAPrivateKeySpec privSpec = factory.getKeySpec(privKey, RSAPrivateKeySpec.class);
+
+        RSAPublicKeySpec pubSpec = new RSAPublicKeySpec(privSpec.getModulus(), privSpec.getPrivateExponent());
+
+        PublicKey pubKey = factory.generatePublic(pubSpec);
+
+        return pubKey;
     }
 }

@@ -4,11 +4,21 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.pkcs.PKCSException;
 import org.cj5x.chain.stow.Keychain;
 import org.cj5x.chain.stow.Storage;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 
 public class CubeEngine extends Thread {
@@ -67,16 +77,24 @@ public class CubeEngine extends Thread {
 
                 Block mintedBlock = mint();
                 encryptIt(mintedBlock);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | IOException | NoSuchAlgorithmException | InvalidKeySpecException |
+                     NoSuchProviderException | PKCSException | NoSuchPaddingException | IllegalBlockSizeException |
+                     BadPaddingException | InvalidKeyException e) {
                 System.err.println("unable to put the thread to bed... " + e.getMessage());
             }
         }
     }
 
-    public void encryptIt(Block b) {
+    public void encryptIt(Block b) throws IOException, NoSuchAlgorithmException,
+            InvalidKeySpecException, NoSuchProviderException, PKCSException,
+            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
+            InvalidKeyException {
         String bS = b.toString();
         byte[] bB = bS.getBytes(StandardCharsets.UTF_8);
-
+        byte[] encBB = EncryptIt.encrypt(bB, getKeychain().getPublicKey());
+        FileOutputStream fos = getStorage().getOutStream();
+        fos.write(encBB);
+        fos.flush();
     }
 
     public CubeTrain getTrain() {
